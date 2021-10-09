@@ -35,7 +35,7 @@ type application struct {
 }
 
 func init() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load("../../.env"); err != nil {
 		log.Print("No .env file found")
 	}
 
