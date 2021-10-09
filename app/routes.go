@@ -15,6 +15,7 @@ func (app *application) routes() http.Handler {
 	mux.Put("/events/:domain_name/delivered", standardMiddleware.ThenFunc(app.updateDelivered))
 	mux.Put("/events/:domain_name/bounced", standardMiddleware.ThenFunc(app.updateBounced))
 	mux.Get("/domains/:domain_name", standardMiddleware.ThenFunc(app.checkStatus))
+	mux.Get("/ping", standardMiddleware.ThenFunc(app.ping))
 
 	return standardMiddleware.Then(mux)
 }

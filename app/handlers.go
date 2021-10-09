@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 )
 
-func ping(w http.ResponseWriter, r *http.Request) {
+func (app *application) ping(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
