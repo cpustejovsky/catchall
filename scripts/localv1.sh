@@ -1,7 +1,7 @@
 #!/bin/bash
 
 date=$(date +"%F")
-path=$GOPATH/src/catchall/logs/$date
+path=$GOPATH/src/catchall/logs/v1/$date
 mkdir $path
 mkdir $path/localdb
 mkdir $path/compass
