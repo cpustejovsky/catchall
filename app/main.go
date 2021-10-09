@@ -48,13 +48,16 @@ func main() {
 	// Flag and Config Setup
 	cfg := new(Config)
 	flag.StringVar(&cfg.Addr, "addr", ":5000", "HTTP network address")
+	flag.StringVar(&cfg.Uri, "uri", "", "MongoDB URI")
 	flag.Parse()
 	// Environemntal Variables
-	var mongodbURI = os.Getenv("MONGO_URI")
-	infoLog.Println("mongodbURI: ", mongodbURI)
+	if cfg.Uri == "" {
+		cfg.Uri = os.Getenv("MONGO_URI")
+	}
+
 	// DB Setup
 	clientOptions := options.Client().
-		ApplyURI(mongodbURI)
+		ApplyURI(cfg.Uri)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, clientOptions)
