@@ -29,7 +29,6 @@ func (d *DomainModel) UpdateDelivered(name string) error {
 	return nil
 }
 func (d *DomainModel) UpdateBounced(name string) error {
-	log.Println(name)
 	_, err := d.DB.UpdateOne(context.TODO(), bson.M{
 		"name": name,
 	}, bson.D{
@@ -52,6 +51,12 @@ func (d *DomainModel) CheckStatus(name string) (string, error) {
 	}
 	bounced := domain["bounced"]
 	delivered := domain["delivered"]
+	if bounced == nil {
+		bounced = 0
+	}
+	if delivered == nil {
+		delivered = 0
+	}
 	fmt.Printf("bounced = %T\n", bounced)
 	fmt.Printf("delivered = %T\n", delivered)
 	bouncedInt, ok := bounced.(int32)
