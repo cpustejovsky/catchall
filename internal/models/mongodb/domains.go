@@ -16,30 +16,50 @@ type DomainModel struct {
 }
 
 func (d *DomainModel) UpdateDelivered(name string) error {
-	log.Println(name)
-	_, err := d.DB.UpdateOne(context.TODO(), bson.M{
+
+	filter := bson.M{
 		"name": name,
-	}, bson.D{
+	}
+	update := bson.D{
 		{"$inc", bson.D{{"delivered", 1}}},
-	}, options.Update().SetUpsert(true))
-	if err != nil {
-		log.Println(err)
-		return err
+	}
+
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+
+	result := d.DB.FindOneAndUpdate(context.TODO(), filter, update, &opt)
+	if result.Err() != nil {
+		return result.Err()
 	}
 	return nil
 }
 func (d *DomainModel) UpdateBounced(name string) error {
-	_, err := d.DB.UpdateOne(context.TODO(), bson.M{
+
+	filter := bson.M{
 		"name": name,
-	}, bson.D{
+	}
+	update := bson.D{
 		{"$inc", bson.D{{"bounced", 1}}},
-	}, options.Update().SetUpsert(true))
-	if err != nil {
-		log.Println(err)
-		return err
+	}
+
+	upsert := true
+	after := options.After
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+
+	result := d.DB.FindOneAndUpdate(context.TODO(), filter, update, &opt)
+	if result.Err() != nil {
+		return result.Err()
 	}
 	return nil
 }
+
 func (d *DomainModel) CheckStatus(name string) (string, error) {
 	domain := bson.M{}
 	err := d.DB.FindOne(context.TODO(), bson.M{
