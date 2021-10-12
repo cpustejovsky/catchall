@@ -25,9 +25,7 @@ func (d *DomainModel) UpdateDelivered(name string) error {
 	}
 
 	upsert := true
-	after := options.After
 	opt := options.FindOneAndUpdateOptions{
-		ReturnDocument: &after,
 		Upsert:         &upsert,
 	}
 
