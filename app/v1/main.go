@@ -83,7 +83,12 @@ func main() {
 	}
 	infoLog.Printf("Starting server on %s", cfg.Addr)
 
+	go func() {
+		log.Println(http.ListenAndServe(":4000", nil))
+	}()
+
 	// Server Start
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
+
 }
