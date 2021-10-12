@@ -21,8 +21,9 @@ var (
 )
 
 type Config struct {
-	Addr string
-	Uri  string
+	Addr  string
+	Uri   string
+	Pprof string
 }
 
 type application struct {
@@ -50,6 +51,7 @@ func main() {
 	cfg := new(Config)
 	flag.StringVar(&cfg.Addr, "addr", ":5000", "HTTP network address")
 	flag.StringVar(&cfg.Uri, "uri", "", "MongoDB URI")
+	flag.StringVar(&cfg.Uri, "pprof", ":4000", "Pprof host and port")
 	flag.Parse()
 	// Environemntal Variables
 	if cfg.Uri == "" {
@@ -84,11 +86,10 @@ func main() {
 	infoLog.Printf("Starting server on %s", cfg.Addr)
 
 	go func() {
-		log.Println(http.ListenAndServe(":4000", nil))
+		log.Println(http.ListenAndServe(cfg.Pprof, nil))
 	}()
 
 	// Server Start
 	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
-
 }
