@@ -14,7 +14,6 @@ func (app *application) updateDelivered(w http.ResponseWriter, r *http.Request) 
 
 	err := app.domains.UpdateDelivered(domain)
 	if err != nil {
-		fmt.Println(err)
 		app.serverError(w, err)
 		return
 	}
@@ -26,7 +25,6 @@ func (app *application) updateBounced(w http.ResponseWriter, r *http.Request) {
 
 	err := app.domains.UpdateBounced(domain)
 	if err != nil {
-		fmt.Println(err)
 		app.serverError(w, err)
 		return
 	}
@@ -38,7 +36,6 @@ func (app *application) checkStatus(w http.ResponseWriter, r *http.Request) {
 
 	status, err := app.domains.CheckStatus(domain)
 	if err != nil {
-		fmt.Println(err)
 		app.serverError(w, err)
 		return
 	}

@@ -3,8 +3,6 @@ package mongodb
 import (
 	"context"
 	"errors"
-	"fmt"
-	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -66,7 +64,6 @@ func (d *DomainModel) CheckStatus(name string) (string, error) {
 		"name": name,
 	}).Decode(&domain)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 	bounced := domain["bounced"]
@@ -77,18 +74,14 @@ func (d *DomainModel) CheckStatus(name string) (string, error) {
 	if delivered == nil {
 		delivered = 0
 	}
-	fmt.Printf("bounced = %T\n", bounced)
-	fmt.Printf("delivered = %T\n", delivered)
 	bouncedInt, ok := bounced.(int32)
 	if !ok {
 		error := errors.New("Bounced did not convert to integer")
-		log.Println(error)
 		return "", error
 	}
 	deliveredInt, ok := delivered.(int32)
 	if !ok {
 		error := errors.New("Delivered did not convert to integer")
-		log.Println(error)
 		return "", error
 	}
 	if bouncedInt >= 1 {
@@ -99,5 +92,4 @@ func (d *DomainModel) CheckStatus(name string) (string, error) {
 	} else {
 		return "unknown", nil
 	}
-	return "foo", nil
 }
