@@ -16,49 +16,34 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	errorLog *log.Logger
-	infoLog  *log.Logger
-)
-
 type Config struct {
 	Addr  string
 	Uri   string
 	Pprof string
 }
 
-type application struct {
-	errorLog *log.Logger
-	infoLog  *log.Logger
-	domains  interface {
-		UpdateDelivered(string) error
-		UpdateBounced(string) error
-		CheckStatus(string) (string, error)
-	}
-}
-
 func init() {
 	if err := godotenv.Load("../../.env"); err != nil {
 		log.Print("No .env file found")
 	}
-
-	// Logging
-	errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.LUTC|log.Llongfile)
-	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.LUTC)
 }
 
 func main() {
 	// Flag and Config Setup
 	cfg := new(Config)
 	flag.StringVar(&cfg.Addr, "addr", ":5000", "HTTP network address")
-	flag.StringVar(&cfg.Uri, "uri", "", "MongoDB URI")
+	flag.StringVar(&cfg.Uri, "uri", "mongodb://localhost:27017/catch_all", "MongoDB URI")
 	flag.StringVar(&cfg.Pprof, "pprof", ":4000", "Pprof host and port")
 	flag.Parse()
 
 	// Environemntal Variables
-	if cfg.Uri == "" {
-		cfg.Uri = os.Getenv("MONGO_URI")
+	mongoUriFromEnv := os.Getenv("MONGO_URI")
+	if mongoUriFromEnv != "" {
+		cfg.Uri = mongoUriFromEnv
 	}
+
+	//Logger Setup
+	logger := logger.NewLogger()
 
 	// DB Setup
 	clientOptions := options.Client().
@@ -70,14 +55,13 @@ func main() {
 		panic(err)
 	}
 	defer client.Disconnect(ctx)
-	infoLog.Println("Successfully connected to database!")
+	logger.InfoLog.Println("Successfully connected to database!")
 
-	logger := logger.NewLogger()
 	srv := &http.Server{
 		Addr:    cfg.Addr,
 		Handler: routes.Routes(logger, client),
 	}
-	infoLog.Printf("Starting server on %s", cfg.Addr)
+	logger.InfoLog.Printf("Starting server on %s", cfg.Addr)
 
 	go func() {
 		log.Println(http.ListenAndServe(cfg.Pprof, nil))
@@ -85,5 +69,5 @@ func main() {
 
 	// Server Start
 	err = srv.ListenAndServe()
-	errorLog.Fatal(err)
+	logger.ErrorLog.Fatal(err)
 }

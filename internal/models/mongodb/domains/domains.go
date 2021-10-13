@@ -1,4 +1,4 @@
-package mongodb
+package domains
 
 import (
 	"context"
@@ -9,11 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type DomainModel struct {
-	DB *mongo.Collection
-}
-
-func (d *DomainModel) UpdateDelivered(name string) error {
+func UpdateDelivered(collection *mongo.Collection, name string) error {
 
 	filter := bson.M{
 		"name": name,
@@ -29,13 +25,13 @@ func (d *DomainModel) UpdateDelivered(name string) error {
 		Upsert:         &upsert,
 	}
 
-	result := d.DB.FindOneAndUpdate(context.TODO(), filter, update, &opt)
+	result := collection.FindOneAndUpdate(context.TODO(), filter, update, &opt)
 	if result.Err() != nil {
 		return result.Err()
 	}
 	return nil
 }
-func (d *DomainModel) UpdateBounced(name string) error {
+func UpdateBounced(collection *mongo.Collection, name string) error {
 
 	filter := bson.M{
 		"name": name,
@@ -51,16 +47,16 @@ func (d *DomainModel) UpdateBounced(name string) error {
 		Upsert:         &upsert,
 	}
 
-	result := d.DB.FindOneAndUpdate(context.TODO(), filter, update, &opt)
+	result := collection.FindOneAndUpdate(context.TODO(), filter, update, &opt)
 	if result.Err() != nil {
 		return result.Err()
 	}
 	return nil
 }
 
-func (d *DomainModel) CheckStatus(name string) (string, error) {
+func CheckStatus(collection *mongo.Collection, name string) (string, error) {
 	domain := bson.M{}
-	err := d.DB.FindOne(context.TODO(), bson.M{
+	err := collection.FindOne(context.TODO(), bson.M{
 		"name": name,
 	}).Decode(&domain)
 	if err != nil {
