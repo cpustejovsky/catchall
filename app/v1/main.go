@@ -51,8 +51,9 @@ func main() {
 	cfg := new(Config)
 	flag.StringVar(&cfg.Addr, "addr", ":5000", "HTTP network address")
 	flag.StringVar(&cfg.Uri, "uri", "", "MongoDB URI")
-	flag.StringVar(&cfg.Uri, "pprof", ":4000", "Pprof host and port")
+	flag.StringVar(&cfg.Pprof, "pprof", ":4000", "Pprof host and port")
 	flag.Parse()
+
 	// Environemntal Variables
 	if cfg.Uri == "" {
 		cfg.Uri = os.Getenv("MONGO_URI")
