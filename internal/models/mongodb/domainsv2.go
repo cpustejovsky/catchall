@@ -2,6 +2,8 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
+	"log"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,53 +31,37 @@ func (d *DomainModelV2) UpdateBounced(name string) error {
 		return err
 	}
 	return nil
-	return nil
 }
 
 func (d *DomainModelV2) CheckStatus(name string) (string, error) {
-	// deliveredDomains := d.DB.Collection("delivered_domains")
-	// bouncedDomains := d.DB.Collection("bounced_domains")
-	// matchStage := bson.D{{"$match", bson.D{{"domain_name", name}}}}
-	// groupStage := bson.D{{"$group", bson.D{{"name", "$domain_name"}, {"total", bson.D{{"$counbt", "$duration"}}}}}}
+	//Create Collections
+	deliveredDomains := d.DB.Collection("delivered_domains")
+	bouncedDomains := d.DB.Collection("bounced_domains")
+	fmt.Println("created collections")
+	bouncedDomainsList := QueryDomains(bouncedDomains, "domain_name", name)
+	deliveredDomainsList := QueryDomains(deliveredDomains, "domain_name", name)
+	fmt.Println("len(bouncedDomainsList)", len(bouncedDomainsList))
+	fmt.Println("len(deliveredDomainsList)", len(deliveredDomainsList))
+	if len(bouncedDomainsList) >= 1 {
+		return "not a catch-all", nil
+	}
+	if len(deliveredDomainsList) >= 1000 {
+		return "catch-all", nil
+	} else {
+		return "unknown", nil
+	}
+}
 
-	// domain := bson.M{}
-
-	// err := d.DB.FindOne(context.TODO(), bson.M{
-	// 	"name": name,
-	// }).Decode(&domain)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return "", err
-	// }
-	// bounced := domain["bounced"]
-	// delivered := domain["delivered"]
-	// if bounced == nil {
-	// 	bounced = 0
-	// }
-	// if delivered == nil {
-	// 	delivered = 0
-	// }
-	// fmt.Printf("bounced = %T\n", bounced)
-	// fmt.Printf("delivered = %T\n", delivered)
-	// bouncedInt, ok := bounced.(int32)
-	// if !ok {
-	// 	error := errors.New("Bounced did not convert to integer")
-	// 	log.Println(error)
-	// 	return "", error
-	// }
-	// deliveredInt, ok := delivered.(int32)
-	// if !ok {
-	// 	error := errors.New("Delivered did not convert to integer")
-	// 	log.Println(error)
-	// 	return "", error
-	// }
-	// if bouncedInt >= 1 {
-	// 	return "not a catch-all", nil
-	// }
-	// if deliveredInt >= 1000 {
-	// 	return "catch-all", nil
-	// } else {
-	// 	return "unknown", nil
-	// }
-	return "foo", nil
+func QueryDomains(collection *mongo.Collection, filter, name string) []bson.M {
+	fmt.Println("querying collection %v", collection.Name())
+	filterCursor, err := collection.Find(context.TODO(), bson.M{filter: name})
+	if err != nil {
+		log.Fatal(err)
+	}
+	var domain []bson.M
+	if err = filterCursor.All(context.TODO(), &domain); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("successfully found domains")
+	return domain
 }
