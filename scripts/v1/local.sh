@@ -2,9 +2,9 @@
 
 date=$(date +"%F")
 path=$GOPATH/src/catchall/logs/v1/$date
-mkdir $path
-mkdir $path/localdb
-mkdir $path/compass
+mkdir -p $path
+mkdir -p $path/localdb
+mkdir -p $path/compass
 cd $GOPATH/src/catchall/app
 
 localPing(){
