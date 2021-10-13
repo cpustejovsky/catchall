@@ -9,7 +9,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/cpustejovsky/catchall/internal/models/mongodb"
+	"github.com/cpustejovsky/catchall/logger"
+	"github.com/cpustejovsky/catchall/routes"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -69,20 +70,12 @@ func main() {
 		panic(err)
 	}
 	defer client.Disconnect(ctx)
-	database := client.Database("catchall_domains")
-	collection := database.Collection("domains")
 	infoLog.Println("Successfully connected to database!")
 
-	// Application and Server Initialization
-	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-		domains:  &mongodb.DomainModel{DB: collection},
-	}
-
+	logger := logger.NewLogger()
 	srv := &http.Server{
 		Addr:    cfg.Addr,
-		Handler: app.routes(),
+		Handler: routes.Routes(logger, client),
 	}
 	infoLog.Printf("Starting server on %s", cfg.Addr)
 
