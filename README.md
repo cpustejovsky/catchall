@@ -52,10 +52,8 @@ My rationale for this approach was to increase the performance of the PUT reques
 
 ## Next Steps
 
-### Immediate
-* Add unit tests and mock out MongoDB
-
 ### Long-Term
+* Add integration tests
 * Containerize V3
   * Run multiple instances of catchall simultaneously to make sure that does not introduce any integrity issues: 
     * Essentially, to make sure that 4 instances each seeing 500 requests to `/events/foobar/delivered` would result in an item with the name of "foobar" in the domains collection on MongoDB having a delivered property of 2000.
