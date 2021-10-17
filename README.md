@@ -42,7 +42,7 @@ the GET request to `/domains/<domain_name>` only needed to find one item in the 
 I tested this for correctness on both my local mongodb and the cloud. The performance results I recorded for v1 are located in the `logs` directory
 ### V2
 
-V2 was a short lived attempt to improve the speed of the PUT requests by creating two collections: `delivered_domains` and `bounced_domains`
+V2 was a short-lived attempt to improve the speed of the PUT requests by creating two collections: `delivered_domains` and `bounced_domains`
 
 PUT requests to `/events/<domain_name>/delivered` added a new item with a `domain_name` key that matched the domain name provided in the request.
 
@@ -51,12 +51,13 @@ I abandoned this after getting worse performance than I had with V1 for `/events
 My rationale for this approach was to increase the performance of the PUT requests with some sacrifice to the GET request as we would need to aggregate the records in each collection that matched the domain name.
 
 ## Next Steps
-
-### Long-Term
+* ~~Containerize V3~~
+* ~~Create modular design for server~~
+### Long-Term'
+* Add [logrus](https://github.com/sirupsen/logrus) to code for logging
 * Add integration tests
-* Containerize V3
-  * Run multiple instances of catchall simultaneously to make sure that does not introduce any integrity issues: 
-    * Essentially, to make sure that 4 instances each seeing 500 requests to `/events/foobar/delivered` would result in an item with the name of "foobar" in the domains collection on MongoDB having a delivered property of 2000.
+* Add authentication
+* Run multiple instances of catchall simultaneously to make sure that does not introduce any integrity issues: 
+  * Essentially, to make sure that 4 instances each seeing 500 requests to `/events/foobar/delivered` would result in an item with the name of "foobar" in the domains collection on MongoDB having a delivered property of 2000.
 * Upgrade my MongoDB cluster to have access to the profile MongoDB Atlas provides to look for areas for improvement
   * Refactor v1 domain models to use [MongoDB transactions](https://www.mongodb.com/developer/quickstart/golang-multi-document-acid-transactions/) to ensure atomic operations and make sure this is still faster than v2's approach. Current work on branch [use_mongo_transactions](https://github.com/cpustejovsky/catchall/tree/use_mongo_transactions) is causing the error `IllegalOperation: Transaction numbers are only allowed on a replica set member or mongos`
-* Create a V3 server following Ardan Lab's [`service` starter kit](https://github.com/ardanlabs/service/) using the pattern developed in V1. Current work is on branch [v3_convert_to_ardanlabs_service_pattern](https://github.com/cpustejovsky/catchall/tree/v3_convert_to_ardanlabs_service_pattern)
