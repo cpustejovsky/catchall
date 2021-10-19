@@ -53,8 +53,8 @@ My rationale for this approach was to increase the performance of the PUT reques
 ## Next Steps
 * ~~Containerize V3~~
 * ~~Create modular design for server~~
-### Long-Term'
-* Add [logrus](https://github.com/sirupsen/logrus) to code for logging
+### Long-Term
+* ~~Add [logrus](https://github.com/sirupsen/logrus) to code for logging~~
 * Add integration tests
 * Add authentication
 * Run multiple instances of catchall simultaneously to make sure that does not introduce any integrity issues: 
