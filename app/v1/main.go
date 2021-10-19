@@ -3,15 +3,14 @@ package main
 import (
 	"context"
 	"flag"
-	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"time"
 
-	"github.com/cpustejovsky/catchall/logger"
 	"github.com/cpustejovsky/catchall/routes"
 	"github.com/joho/godotenv"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -22,9 +21,16 @@ type Config struct {
 	Pprof string
 }
 
+var logger = &logrus.Logger{
+	Out:       os.Stderr,
+	Formatter: new(logrus.TextFormatter),
+	Hooks:     make(logrus.LevelHooks),
+	Level:     logrus.DebugLevel,
+}
+
 func init() {
 	if err := godotenv.Load("../../.env"); err != nil {
-		log.Print("No .env file found")
+		logger.Info("No .env file found")
 	}
 }
 
@@ -42,9 +48,6 @@ func main() {
 		cfg.Uri = mongoUriFromEnv
 	}
 
-	//Logger Setup
-	logger := logger.NewLogger()
-
 	// DB Setup
 	clientOptions := options.Client().
 		ApplyURI(cfg.Uri)
@@ -55,19 +58,19 @@ func main() {
 		panic(err)
 	}
 	defer client.Disconnect(ctx)
-	logger.InfoLog.Println("Successfully connected to database!")
+	logger.Info("Successfully connected to database!")
 
 	srv := &http.Server{
 		Addr:    cfg.Addr,
 		Handler: routes.Routes(logger, client),
 	}
-	logger.InfoLog.Printf("Starting server on %s", cfg.Addr)
+	logger.Info("Starting server on ", cfg.Addr)
 
 	go func() {
-		log.Println(http.ListenAndServe(cfg.Pprof, nil))
+		logger.Info(http.ListenAndServe(cfg.Pprof, nil))
 	}()
 
 	// Server Start
 	err = srv.ListenAndServe()
-	logger.ErrorLog.Fatal(err)
+	logger.Error(err)
 }
