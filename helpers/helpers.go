@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/cpustejovsky/catchall/logger"
+	log "github.com/sirupsen/logrus"
 )
 
-func ServerError(log logger.Logger, w http.ResponseWriter, err error) {
+func ServerError(log *log.Logger, w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
-	log.ErrorLog.Output(2, trace)
+	log.Error(2, trace)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }

@@ -6,12 +6,12 @@ import (
 
 	"github.com/cpustejovsky/catchall/helpers"
 	"github.com/cpustejovsky/catchall/internal/models/mongodb/domains"
-	"github.com/cpustejovsky/catchall/logger"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Handler struct {
-	Logger     logger.Logger
+	Logger     *log.Logger
 	Collection *mongo.Collection
 }
 

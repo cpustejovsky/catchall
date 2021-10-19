@@ -5,13 +5,13 @@ import (
 
 	"github.com/bmizerany/pat"
 	"github.com/cpustejovsky/catchall/handlers"
-	"github.com/cpustejovsky/catchall/logger"
 	"github.com/cpustejovsky/catchall/middleware"
 	"github.com/justinas/alice"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Routes(log logger.Logger, client *mongo.Client) http.Handler {
+func Routes(log *log.Logger, client *mongo.Client) http.Handler {
 
 	middlewares := middleware.Middleware{
 		Logger: log,
