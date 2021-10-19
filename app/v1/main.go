@@ -22,7 +22,7 @@ type Config struct {
 }
 
 var logger = &logrus.Logger{
-	Out:       os.Stderr,
+	Out:       os.Stdout,
 	Formatter: new(logrus.TextFormatter),
 	Hooks:     make(logrus.LevelHooks),
 	Level:     logrus.DebugLevel,
@@ -64,7 +64,9 @@ func main() {
 		Addr:    cfg.Addr,
 		Handler: routes.Routes(logger, client),
 	}
-	logger.Info("Starting server on ", cfg.Addr)
+	logger.WithField(
+		"address", cfg.Addr,
+	).Info("Starting server")
 
 	go func() {
 		logger.Info(http.ListenAndServe(cfg.Pprof, nil))
