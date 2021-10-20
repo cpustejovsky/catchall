@@ -5,19 +5,19 @@ import (
 
 	"github.com/bmizerany/pat"
 	"github.com/cpustejovsky/catchall/handlers"
-	"github.com/cpustejovsky/catchall/logger"
 	"github.com/cpustejovsky/catchall/middleware"
 	"github.com/justinas/alice"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Routes(log logger.Logger, client *mongo.Client) http.Handler {
+func Routes(log *log.Logger, client *mongo.Client) http.Handler {
 
 	middlewares := middleware.Middleware{
 		Logger: log,
 	}
 
-	standardMiddleware := alice.New(middlewares.RecoverPanic, middlewares.LogRequest, middlewares.SecureHeaders)
+	standardMiddleware := alice.New(middlewares.RecoverPanic, middlewares.SecureHeaders, middlewares.LogRequest)
 
 	mux := pat.New()
 
@@ -33,5 +33,5 @@ func Routes(log logger.Logger, client *mongo.Client) http.Handler {
 	mux.Get("/domains/:domain_name", standardMiddleware.ThenFunc(domainHandlers.CheckStatus))
 	mux.Get("/ping", standardMiddleware.ThenFunc(domainHandlers.Ping))
 
-	return standardMiddleware.Then(mux)
+	return mux
 }

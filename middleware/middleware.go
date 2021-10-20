@@ -5,11 +5,12 @@ import (
 	"net/http"
 
 	"github.com/cpustejovsky/catchall/helpers"
-	"github.com/cpustejovsky/catchall/logger"
+	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type Middleware struct {
-	Logger logger.Logger
+	Logger *log.Logger
 }
 
 func (m *Middleware) SecureHeaders(next http.Handler) http.Handler {
@@ -25,8 +26,7 @@ func (m *Middleware) SecureHeaders(next http.Handler) http.Handler {
 
 func (m *Middleware) LogRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		m.Logger.InfoLog.Printf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.RequestURI())
-
+		m.Logger.WithFields(logrus.Fields{"Remote Address": r.RemoteAddr, "Proto": r.Proto, "Method": r.Method, "URI": r.URL.RequestURI()}).Info("Request")
 		next.ServeHTTP(w, r)
 	})
 }
